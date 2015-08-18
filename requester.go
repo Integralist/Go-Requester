@@ -35,6 +35,39 @@ func getComponents() []byte {
 	return []byte(`{"components":[{"id":"local","url":"http://localhost:8080/pugs"},{"id":"google","url":"http://google.com/"},{"id":"integralist","url":"http://integralist.co.uk/"},{"id":"sloooow","url":"http://stevesouders.com/cuzillion/?c0=hj1hfff30_5_f&t=1439194716962"}]}`)
 }
 
+func getComponent(cr *[]ComponentResponse, wg *sync.WaitGroup, client *http.Client, i int, v Component) {
+	defer wg.Done()
+	// fmt.Printf("index = %d; id = %s; value = %s\n", i, v.Id, v.Url)
+
+	resp, err := client.Get(v.Url)
+
+	fmt.Printf("%+v", resp)
+	fmt.Println("\n---")
+
+	if err != nil {
+		fmt.Printf("Problem getting the response: %s\n", err)
+
+		// cr = append(cr, ComponentResponse{
+		// 	v.Id,
+		// 	404,
+		// 	err.Error(),
+		// })
+	} else {
+		defer resp.Body.Close()
+		contents, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Printf("Problem reading the body: %s\n", err)
+		}
+		// fmt.Printf("Response body: %s\n", string(contents))
+
+		*cr = append(*cr, ComponentResponse{
+			v.Id,
+			resp.StatusCode,
+			string(contents),
+		})
+	}
+}
+
 func main() {
 	var cr []ComponentResponse
 	var c ComponentsList
@@ -48,47 +81,15 @@ func main() {
 	// fmt.Println("First Url:", c.Components[0].Url)
 	// fmt.Println("Number of components", len(c.Components))
 
-	var wg sync.WaitGroup
-
 	timeout := time.Duration(1 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
 	}
 
+	var wg sync.WaitGroup
 	for i, v := range c.Components {
 		wg.Add(1)
-
-		go func(i int, v Component) {
-			defer wg.Done()
-			// fmt.Printf("index = %d; id = %s; value = %s\n", i, v.Id, v.Url)
-
-			resp, err := client.Get(v.Url)
-
-			// fmt.Printf("%+v", resp)
-
-			if err != nil {
-				fmt.Printf("Problem getting the response: %s\n", err)
-
-				cr = append(cr, ComponentResponse{
-					v.Id,
-					404,
-					err.Error(),
-				})
-			} else {
-				defer resp.Body.Close()
-				contents, err := ioutil.ReadAll(resp.Body)
-				if err != nil {
-					fmt.Printf("Problem reading the body: %s\n", err)
-				}
-				// fmt.Printf("Response body: %s\n", string(contents))
-
-				cr = append(cr, ComponentResponse{
-					v.Id,
-					resp.StatusCode,
-					string(contents),
-				})
-			}
-		}(i, v)
+		go getComponent(&cr, &wg, &client, i, v) // don't forget to pass structs by "reference" (default is pass by "value")
 	}
 	wg.Wait()
 

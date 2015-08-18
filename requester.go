@@ -45,7 +45,7 @@ func getComponent(cr *[]ComponentResponse, wg *sync.WaitGroup, client *http.Clie
 	fmt.Println("\n---")
 
 	if err != nil {
-		fmt.Printf("Problem getting the response: %s\n", err)
+		fmt.Printf("Problem getting the response: %s\n\n", err)
 
 		// cr = append(cr, ComponentResponse{
 		// 	v.Id,

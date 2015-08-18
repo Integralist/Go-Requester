@@ -31,11 +31,15 @@ type Result struct {
 
 var overallStatus string = "success"
 
+func getComponents() []byte {
+	return []byte(`{"components":[{"id":"local","url":"http://localhost:8080/pugs"},{"id":"google","url":"http://google.com/"},{"id":"integralist","url":"http://integralist.co.uk/"},{"id":"sloooow","url":"http://stevesouders.com/cuzillion/?c0=hj1hfff30_5_f&t=1439194716962"}]}`)
+}
+
 func main() {
 	var cr []ComponentResponse
 	var c ComponentsList
 
-	b := []byte(`{"components":[{"id":"local","url":"http://localhost:8080/pugs"},{"id":"google","url":"http://google.com/"},{"id":"integralist","url":"http://integralist.co.uk/"},{"id":"sloooow","url":"http://stevesouders.com/cuzillion/?c0=hj1hfff30_5_f&t=1439194716962"}]}`)
+	b := getComponents()
 
 	json.Unmarshal(b, &c)
 

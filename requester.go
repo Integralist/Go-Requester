@@ -47,11 +47,11 @@ func getComponent(cr *[]ComponentResponse, wg *sync.WaitGroup, client *http.Clie
 	if err != nil {
 		fmt.Printf("Problem getting the response: %s\n\n", err)
 
-		// cr = append(cr, ComponentResponse{
-		// 	v.Id,
-		// 	404,
-		// 	err.Error(),
-		// })
+		*cr = append(*cr, ComponentResponse{
+			v.Id,
+			500,
+			err.Error(),
+		})
 	} else {
 		defer resp.Body.Close()
 		contents, err := ioutil.ReadAll(resp.Body)

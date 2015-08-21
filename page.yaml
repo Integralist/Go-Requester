@@ -5,3 +5,13 @@ components:
     url: http://integralist.co.uk
   - id: bbc-news
     url: http://www.bbc.co.uk/news
+  - id: sloooow
+    url: http://localhost:3000/pugs
+  - id: not-found
+    url: http://httpstat.us/404
+  - id: timeout
+    url: http://httpstat.us/408
+  - id: server-error
+    url: http://httpstat.us/500
+  - id: service-unavailable
+    url: http://httpstat.us/503

@@ -1,4 +1,4 @@
-// Wait for 1.5 release to be able to verify timeout error (bug in language)
+// Switch to Go 1.5 release to be able to verify timeout error (bug in language)
 // Use -race flag https://blog.golang.org/race-detector to detect race conditions
 
 package main
@@ -24,14 +24,14 @@ type ComponentsList struct {
 }
 
 type ComponentResponse struct {
-	Id     string
-	Status int
-	Body   string
+	Id     string `json:"id"`
+	Status int    `json:"status"`
+	Body   string `json:"body"`
 }
 
 type Result struct {
-	Status     string
-	Components []ComponentResponse
+	Status     string              `json:"status"`
+	Components []ComponentResponse `json:"components"`
 }
 
 var overallStatus string = "success"

@@ -14,27 +14,27 @@
 
 ```json
 {
-  status: "success",
-  components: [
+  "status": "success",
+  "components": [
     {
-      id: "google",
-      status: 200,
-      body: "<doctype! html> ... </html>"
+      "id": "google",
+      "status": 200,
+      "body": "<doctype! html> ... </html>"
     },
     {
-      id: "integralist",
-      status: 200,
-      body: "<doctype! html> ... </html>"
+      "id": "integralist",
+      "status": 200,
+      "body": "<doctype! html> ... </html>"
     },
     {
-      id: "slooow",
-      status: 408,
-      body: "Get http://localhost:3000/pugs: net/http: request canceled (Client.Timeout exceeded while awaiting headers)"
+      "id": "slooow",
+      "status": 408,
+      "body": "Get http://localhost:3000/pugs: net/http: request canceled (Client.Timeout exceeded while awaiting headers)"
     }
     {
-      id: "not-found",
-      status: 404,
-      body: "404 Not Found"
+      "id": "not-found",
+      "status": 404,
+      "body": "404 Not Found"
     }
   ]
 }

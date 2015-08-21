@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"regexp"
 	"sync"
 	"time"
 
@@ -36,6 +37,16 @@ type Result struct {
 
 var overallStatus string = "success"
 
+func checkError(msg string) int {
+	timeout, _ := regexp.MatchString("Timeout", msg)
+
+	if timeout {
+		return 408
+	} else {
+		return 500
+	}
+}
+
 func getComponent(wg *sync.WaitGroup, client *http.Client, i int, v Component, ch chan ComponentResponse) {
 	defer wg.Done()
 
@@ -45,7 +56,7 @@ func getComponent(wg *sync.WaitGroup, client *http.Client, i int, v Component, c
 		fmt.Printf("Problem getting the response: %s\n\n", err)
 
 		ch <- ComponentResponse{
-			v.Id, 500, err.Error(),
+			v.Id, checkError(err.Error()), err.Error(),
 		}
 	} else {
 		defer resp.Body.Close()
@@ -99,7 +110,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(string(j))
+	// fmt.Println(string(j))
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(j)

@@ -1,6 +1,3 @@
-// Switch to Go 1.5 release to be able to verify timeout error (bug in language)
-// Use -race flag https://blog.golang.org/race-detector to detect race conditions
-
 package main
 
 import (

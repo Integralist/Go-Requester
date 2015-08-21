@@ -1,8 +1,0 @@
-- id: local
-  url: http://localhost:8080/pugs
-- id: google
-  url: http://google.com/
-- id: integralist
-  url: http://integralist.co.uk/
-- id: slow_frontend
-  url: http://stevesouders.com/cuzillion/?c0=hj1hfff30_5_f&t=1439194716962

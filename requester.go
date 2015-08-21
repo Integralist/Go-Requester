@@ -1,3 +1,6 @@
+// Wait for 1.5 release to be able to verify timeout error (bug in language)
+// Use -race flag https://blog.golang.org/race-detector to detect race conditions
+
 package main
 
 import (
@@ -7,15 +10,17 @@ import (
 	"net/http"
 	"sync"
 	"time"
+
+	"gopkg.in/yaml.v2"
 )
 
 type Component struct {
-	Id  string `json:"id"`
-	Url string `json:"url"`
+	Id  string `yaml:"id"`
+	Url string `yaml:"url"`
 }
 
 type ComponentsList struct {
-	Components []Component `json:"components"`
+	Components []Component `yaml:"components"`
 }
 
 type ComponentResponse struct {
@@ -30,10 +35,6 @@ type Result struct {
 }
 
 var overallStatus string = "success"
-
-func getComponents() []byte {
-	return []byte(`{"components":[{"id":"local","url":"http://localhost:8080/pugs"},{"id":"google","url":"http://google.com/"},{"id":"integralist","url":"http://integralist.co.uk/"},{"id":"sloooow","url":"http://stevesouders.com/cuzillion/?c0=hj1hfff30_5_f&t=1439194716962"}]}`)
-}
 
 func getComponent(wg *sync.WaitGroup, client *http.Client, i int, v Component, ch chan ComponentResponse) {
 	defer wg.Done()
@@ -50,7 +51,7 @@ func getComponent(wg *sync.WaitGroup, client *http.Client, i int, v Component, c
 		defer resp.Body.Close()
 		contents, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			fmt.Printf("Problem reading the body: %s\n", err)
+			fmt.Printf("Problem reading the body for %s -> %s\n", v.Id, err)
 		}
 
 		ch <- ComponentResponse{
@@ -59,14 +60,25 @@ func getComponent(wg *sync.WaitGroup, client *http.Client, i int, v Component, c
 	}
 }
 
-func main() {
+func getComponents() []byte {
+	config, err := ioutil.ReadFile("./page.yaml")
+
+	if err != nil {
+		fmt.Printf("Problem reading the page config: %s\n", err)
+		panic(err)
+	}
+
+	return config
+}
+
+func handler(w http.ResponseWriter, r *http.Request) {
 	var cr []ComponentResponse
-	var c ComponentsList
+	var y ComponentsList
 
 	ch := make(chan ComponentResponse)
-	b := getComponents()
 
-	json.Unmarshal(b, &c)
+	b := getComponents()
+	yaml.Unmarshal(b, &y)
 
 	timeout := time.Duration(1 * time.Second)
 	client := http.Client{
@@ -74,7 +86,7 @@ func main() {
 	}
 
 	var wg sync.WaitGroup
-	for i, v := range c.Components {
+	for i, v := range y.Components {
 		wg.Add(1)
 		go getComponent(&wg, &client, i, v, ch)
 		cr = append(cr, <-ch)
@@ -88,4 +100,12 @@ func main() {
 	}
 
 	fmt.Println(string(j))
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(j)
+}
+
+func main() {
+	http.HandleFunc("/", handler)
+	http.ListenAndServe(":8080", nil)
 }

@@ -1,0 +1,7 @@
+components:
+  - id: google
+    url: http://google.com
+  - id: integralist
+    url: http://integralist.co.uk
+  - id: bbc-news
+    url: http://www.bbc.co.uk/news

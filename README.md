@@ -101,6 +101,12 @@ func main() {
 // Example -> http://localhost:3000/pugs
 ```
 
+## Curl Timings
+
+- `curl -w "@curl-format.txt" -o /dev/null -s http://localhost:8080/`
+
+> Note: I've included a `curl-format.txt` file within the repo
+
 ## Compilation
 
 I recommend using [Gox](https://github.com/mitchellh/gox).

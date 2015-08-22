@@ -1,7 +1,7 @@
 <h1 align="center">Go-Requester</h1>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/TODO-5%25-green.svg?style=flat-square">
+  <img src="https://img.shields.io/badge/Completed-90%25-green.svg?style=flat-square">
 </p>
 
 <p align="center">

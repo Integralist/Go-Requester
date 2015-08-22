@@ -1,7 +1,7 @@
 <h1 align="center">Go-Requester</h1>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/status-100%25-green.svg?style=flat-square">
+  <img src="https://img.shields.io/badge/TODO-5%25-green.svg?style=flat-square">
 </p>
 
 <p align="center">
@@ -72,6 +72,10 @@ components:
 - `go run requester.go`
 - `go run slow-endpoint.go`
 - `curl http://localhost:8080/` (better to check via a web browser)
+
+### TODO
+
+- Tests!
 
 ### Licence
 

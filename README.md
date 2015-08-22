@@ -70,14 +70,38 @@ components:
 ## Setup example
 
 - `go run requester.go`
-- `go run slow-endpoint.go`
+- `go run slow-endpoint.go` (see below for an example script)
 - `curl http://localhost:8080/` (better to check via a web browser)
 
-### TODO
+### Slow HTTP Server
+
+```go
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"time"
+)
+
+func handler(w http.ResponseWriter, r *http.Request) {
+	time.Sleep(5000 * time.Millisecond)
+	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
+}
+
+func main() {
+	http.HandleFunc("/", handler)
+	http.ListenAndServe(":3000", nil)
+}
+
+// Example -> http://localhost:3000/pugs
+```
+
+## TODO
 
 - Tests!
 
-### Licence
+## Licence
 
 [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 

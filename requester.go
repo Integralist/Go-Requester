@@ -35,8 +35,6 @@ type Result struct {
 	Components []ComponentResponse `json:"components"`
 }
 
-var summary string = "success"
-
 func checkError(msg string) int {
 	timeout, _ := regexp.MatchString("Timeout", msg)
 
@@ -97,7 +95,7 @@ func finalSummary(components []ComponentResponse) string {
 		}
 	}
 
-	return summary
+	return "success"
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {

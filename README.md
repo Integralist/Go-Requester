@@ -48,6 +48,7 @@
 
 ## TODO
 
+- Add success/fail status for each component based off its status code not being a 200 or 304
 - Add mandatory key
 - Ensure overall status is set to fail if any mandatory components fail
 

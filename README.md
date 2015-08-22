@@ -108,8 +108,16 @@ I recommend using [Gox](https://github.com/mitchellh/gox).
 - `go get github.com/mitchellh/gox`
 - `gox`
 
+## Local Testing
+
+> Note: this example is for Mac OS X
+
+- `gox -osarch="darwin/amd64" -output="{{.Dir}}"`
+- `./Go-Requester`
+
 ## TODO
 
+- Dynamically change port number when run as binary
 - Tests!
 
 ## Licence

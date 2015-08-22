@@ -101,6 +101,13 @@ func main() {
 // Example -> http://localhost:3000/pugs
 ```
 
+## Compilation
+
+I recommend using [Gox](https://github.com/mitchellh/gox).
+
+- `go get github.com/mitchellh/gox`
+- `gox`
+
 ## TODO
 
 - Tests!

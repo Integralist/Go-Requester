@@ -10,6 +10,27 @@
 
 > Requires Go 1.5+
 
+## Example Page Config
+
+```yaml
+components:
+  - id: google
+    url: http://google.com
+  - id: integralist
+    url: http://integralist.co.uk
+    mandatory: true
+  - id: not-found
+    url: http://httpstat.us/404
+  - id: timeout
+    url: http://httpstat.us/408
+  - id: server-error
+    url: http://httpstat.us/500
+  - id: service-unavailable
+    url: http://httpstat.us/503
+```
+
+> Note: example config provided
+
 ## Example JSON Output
 
 ```json
@@ -19,38 +40,38 @@
     {
       "id": "google",
       "status": 200,
-      "body": "<doctype! html> ... </html>"
+      "body": "<doctype! html> ... </html>",
+      "mandatory": false
     },
     {
       "id": "integralist",
       "status": 200,
-      "body": "<doctype! html> ... </html>"
+      "body": "<doctype! html> ... </html>",
+      "mandatory": true
     },
     {
       "id": "slooow",
       "status": 408,
-      "body": "Get http://localhost:3000/pugs: net/http: request canceled (Client.Timeout exceeded while awaiting headers)"
+      "body": "Get http://localhost:3000/pugs: net/http: request canceled (Client.Timeout exceeded while awaiting headers)",
+      "mandatory": false
     }
     {
       "id": "not-found",
       "status": 404,
-      "body": "404 Not Found"
+      "body": "404 Not Found",
+      "mandatory": false
     }
   ]
 }
 ```
+
+> Note: the toplevel `summary` key's value will be `failure` if any mandatory components fail
 
 ## Setup example
 
 - `go run requester.go`
 - `go run slow-endpoint.go`
 - `curl http://localhost:8080/` (better to check via a web browser)
-
-## TODO
-
-- Add success/fail status for each component based off its status code not being a 200 or 304
-- Add mandatory key
-- Ensure overall status is set to fail if any mandatory components fail
 
 ### Licence
 

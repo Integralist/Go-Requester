@@ -3,6 +3,7 @@ components:
     url: http://google.com
   - id: integralist
     url: http://integralist.co.uk
+    mandatory: true
   - id: bbc-news
     url: http://www.bbc.co.uk/news
   - id: sloooow

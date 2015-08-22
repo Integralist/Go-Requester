@@ -13,8 +13,9 @@ import (
 )
 
 type Component struct {
-	Id  string `yaml:"id"`
-	Url string `yaml:"url"`
+	Id        string `yaml:"id"`
+	Url       string `yaml:"url"`
+	Mandatory bool   `yaml:"mandatory"`
 }
 
 type ComponentsList struct {
@@ -22,10 +23,11 @@ type ComponentsList struct {
 }
 
 type ComponentResponse struct {
-	Id      string `json:"id"`
-	Status  int    `json:"status"`
-	Body    string `json:"body"`
-	Summary string `json:"summary"`
+	Id        string `json:"id"`
+	Status    int    `json:"status"`
+	Body      string `json:"body"`
+	Summary   string `json:"summary"`
+	Mandatory bool   `json:"mandatory"`
 }
 
 type Result struct {
@@ -62,7 +64,7 @@ func getComponent(wg *sync.WaitGroup, client *http.Client, i int, v Component, c
 		status := checkError(err.Error())
 
 		ch <- ComponentResponse{
-			v.Id, status, err.Error(), getSummary(status),
+			v.Id, status, err.Error(), getSummary(status), v.Mandatory,
 		}
 	} else {
 		defer resp.Body.Close()
@@ -72,7 +74,7 @@ func getComponent(wg *sync.WaitGroup, client *http.Client, i int, v Component, c
 		}
 
 		ch <- ComponentResponse{
-			v.Id, resp.StatusCode, string(contents), getSummary(resp.StatusCode),
+			v.Id, resp.StatusCode, string(contents), getSummary(resp.StatusCode), v.Mandatory,
 		}
 	}
 }
@@ -86,6 +88,16 @@ func getComponents() []byte {
 	}
 
 	return config
+}
+
+func finalSummary(components []ComponentResponse) string {
+	for _, c := range components {
+		if c.Mandatory == true && c.Summary == "failure" {
+			return "failure"
+		}
+	}
+
+	return summary
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -110,7 +122,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 	wg.Wait()
 
-	j, err := json.Marshal(Result{summary, cr})
+	j, err := json.Marshal(Result{finalSummary(cr), cr})
 	if err != nil {
 		fmt.Printf("Problem converting to JSON: %s\n", err)
 		return

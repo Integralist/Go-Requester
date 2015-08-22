@@ -22,17 +22,18 @@ type ComponentsList struct {
 }
 
 type ComponentResponse struct {
-	Id     string `json:"id"`
-	Status int    `json:"status"`
-	Body   string `json:"body"`
+	Id      string `json:"id"`
+	Status  int    `json:"status"`
+	Body    string `json:"body"`
+	Summary string `json:"summary"`
 }
 
 type Result struct {
-	Status     string              `json:"status"`
+	Summary    string              `json:"summary"`
 	Components []ComponentResponse `json:"components"`
 }
 
-var overallStatus string = "success"
+var summary string = "success"
 
 func checkError(msg string) int {
 	timeout, _ := regexp.MatchString("Timeout", msg)
@@ -44,6 +45,13 @@ func checkError(msg string) int {
 	}
 }
 
+func getSummary(status int) string {
+	if status == 200 || status == 304 {
+		return "success"
+	}
+	return "failure"
+}
+
 func getComponent(wg *sync.WaitGroup, client *http.Client, i int, v Component, ch chan ComponentResponse) {
 	defer wg.Done()
 
@@ -51,9 +59,10 @@ func getComponent(wg *sync.WaitGroup, client *http.Client, i int, v Component, c
 
 	if err != nil {
 		fmt.Printf("Problem getting the response: %s\n\n", err)
+		status := checkError(err.Error())
 
 		ch <- ComponentResponse{
-			v.Id, checkError(err.Error()), err.Error(),
+			v.Id, status, err.Error(), getSummary(status),
 		}
 	} else {
 		defer resp.Body.Close()
@@ -63,7 +72,7 @@ func getComponent(wg *sync.WaitGroup, client *http.Client, i int, v Component, c
 		}
 
 		ch <- ComponentResponse{
-			v.Id, resp.StatusCode, string(contents),
+			v.Id, resp.StatusCode, string(contents), getSummary(resp.StatusCode),
 		}
 	}
 }
@@ -101,7 +110,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 	wg.Wait()
 
-	j, err := json.Marshal(Result{overallStatus, cr})
+	j, err := json.Marshal(Result{summary, cr})
 	if err != nil {
 		fmt.Printf("Problem converting to JSON: %s\n", err)
 		return

@@ -14,7 +14,7 @@
 
 ```json
 {
-  "status": "success",
+  "summary": "success",
   "components": [
     {
       "id": "google",

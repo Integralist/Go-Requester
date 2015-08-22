@@ -8,8 +8,6 @@
   <b>HTTP service</b> that accepts a collection of "components"<br>then fans-out requests and returns <b>aggregated content</b>
 </p>
 
-> Requires Go 1.5+
-
 - Components should be defined in a YAML page configuration file 
 - Components are requested concurrently via goroutines
 - Components can be marked as "mandatory" (if they fail, the request summary is set to "failure")

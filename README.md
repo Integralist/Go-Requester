@@ -107,6 +107,12 @@ func main() {
 
 > Note: I've included a `curl-format.txt` file within the repo
 
+## Dependencies
+
+I use [godep](https://github.com/tools/godep) to act like a dependency lockfile (think the Go equivalent to Ruby's `Gemfile.lock`). So you'll find inside this repo a `Godeps` folder containing any packages not part of the standard library.
+
+- `godep save -r`
+
 ## Compilation
 
 I recommend using [Gox](https://github.com/mitchellh/gox).

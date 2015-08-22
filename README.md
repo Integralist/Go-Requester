@@ -129,6 +129,7 @@ I recommend using [Gox](https://github.com/mitchellh/gox).
 
 ## TODO
 
+- Add logic for loading page config remotely
 - Dynamically change port number when run as binary
 - Tests!
 

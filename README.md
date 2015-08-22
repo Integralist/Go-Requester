@@ -10,6 +10,10 @@
 
 > Requires Go 1.5+
 
+- Components should be defined in a YAML page configuration file 
+- Components are requested concurrently via goroutines
+- Components can be marked as "mandatory" (if they fail, the request summary is set to "failure")
+
 ## Example Page Config
 
 ```yaml
@@ -29,7 +33,7 @@ components:
     url: http://httpstat.us/503
 ```
 
-> Note: example config provided
+> Note: example config provided as part of this repo
 
 ## Example JSON Output
 

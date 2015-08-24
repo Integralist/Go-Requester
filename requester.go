@@ -12,27 +12,27 @@ import (
 	"github.com/integralist/go-requester/Godeps/_workspace/src/gopkg.in/yaml.v2"
 )
 
-type Component struct {
-	Id        string `yaml:"id"`
-	Url       string `yaml:"url"`
+type component struct {
+	ID        string `yaml:"id"`
+	URL       string `yaml:"url"`
 	Mandatory bool   `yaml:"mandatory"`
 }
 
-type ComponentsList struct {
-	Components []Component `yaml:"components"`
+type componentsList struct {
+	Components []component `yaml:"components"`
 }
 
-type ComponentResponse struct {
-	Id        string `json:"id"`
+type componentResponse struct {
+	ID        string `json:"id"`
 	Status    int    `json:"status"`
 	Body      string `json:"body"`
 	Summary   string `json:"summary"`
 	Mandatory bool   `json:"mandatory"`
 }
 
-type Result struct {
+type result struct {
 	Summary    string              `json:"summary"`
-	Components []ComponentResponse `json:"components"`
+	Components []componentResponse `json:"components"`
 }
 
 func checkError(msg string) int {
@@ -40,9 +40,8 @@ func checkError(msg string) int {
 
 	if timeout {
 		return 408
-	} else {
-		return 500
 	}
+	return 500
 }
 
 func getSummary(status int) string {
@@ -52,27 +51,27 @@ func getSummary(status int) string {
 	return "failure"
 }
 
-func getComponent(wg *sync.WaitGroup, client *http.Client, i int, v Component, ch chan ComponentResponse) {
+func getComponent(wg *sync.WaitGroup, client *http.Client, i int, v component, ch chan componentResponse) {
 	defer wg.Done()
 
-	resp, err := client.Get(v.Url)
+	resp, err := client.Get(v.URL)
 
 	if err != nil {
 		fmt.Printf("Problem getting the response: %s\n\n", err)
 		status := checkError(err.Error())
 
-		ch <- ComponentResponse{
-			v.Id, status, err.Error(), getSummary(status), v.Mandatory,
+		ch <- componentResponse{
+			v.ID, status, err.Error(), getSummary(status), v.Mandatory,
 		}
 	} else {
 		defer resp.Body.Close()
 		contents, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			fmt.Printf("Problem reading the body for %s -> %s\n", v.Id, err)
+			fmt.Printf("Problem reading the body for %s -> %s\n", v.ID, err)
 		}
 
-		ch <- ComponentResponse{
-			v.Id, resp.StatusCode, string(contents), getSummary(resp.StatusCode), v.Mandatory,
+		ch <- componentResponse{
+			v.ID, resp.StatusCode, string(contents), getSummary(resp.StatusCode), v.Mandatory,
 		}
 	}
 }
@@ -88,7 +87,7 @@ func getComponents() []byte {
 	return config
 }
 
-func finalSummary(components []ComponentResponse) string {
+func finalSummary(components []componentResponse) string {
 	for _, c := range components {
 		if c.Mandatory == true && c.Summary == "failure" {
 			return "failure"
@@ -99,10 +98,10 @@ func finalSummary(components []ComponentResponse) string {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	var cr []ComponentResponse
-	var y ComponentsList
+	var cr []componentResponse
+	var y componentsList
 
-	ch := make(chan ComponentResponse)
+	ch := make(chan componentResponse)
 
 	b := getComponents()
 	yaml.Unmarshal(b, &y)
@@ -120,7 +119,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 	wg.Wait()
 
-	j, err := json.Marshal(Result{finalSummary(cr), cr})
+	j, err := json.Marshal(result{finalSummary(cr), cr})
 	if err != nil {
 		fmt.Printf("Problem converting to JSON: %s\n", err)
 		return

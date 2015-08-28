@@ -77,6 +77,8 @@ components:
 - `go run slow-endpoint.go` (see below for an example script)
 - `curl http://localhost:8080/` (better to check via a web browser)
 
+> Note: you can also use `godo run --watch` to track changes and automatically re-run
+
 ### Slow HTTP Server
 
 ```go

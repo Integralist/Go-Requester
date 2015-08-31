@@ -44,13 +44,13 @@ components:
     {
       "id": "google",
       "status": 200,
-      "body": "<doctype! html> ... </html>",
+      "body": "<!doctype html> ... </html>",
       "mandatory": false
     },
     {
       "id": "integralist",
       "status": 200,
-      "body": "<doctype! html> ... </html>",
+      "body": "<!doctype html> ... </html>",
       "mandatory": true
     },
     {

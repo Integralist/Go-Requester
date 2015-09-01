@@ -73,6 +73,13 @@ components:
 
 ## Setup example
 
+### Docker
+
+- `docker build -t my-golang-app .`
+- `docker run --rm --name go-tester -v "$PWD":/go/src/github.com/integralist/go-requester -w /go/src/github.com/integralist/go-requester -p 8080:8080 my-golang-app`
+
+### Host machine running Go
+
 - `go run requester.go`
 - `go run slow-endpoint.go` (see below for an example script)
 - `curl http://localhost:8080/` (better to check via a web browser)

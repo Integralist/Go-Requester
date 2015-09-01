@@ -3,8 +3,8 @@ package main
 import . "gopkg.in/godo.v1"
 
 func tasks(p *Project) {
-	p.Task("run", func(c *Context) error {
-		return Start(`go run requester.go`)
+	p.Task("watch-server", func(c *Context) error {
+		return Start(`requester.go`)
 	}).Watch("**/*.go")
 }
 

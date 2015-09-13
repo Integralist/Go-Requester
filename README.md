@@ -71,6 +71,25 @@ components:
 
 > Note: the toplevel `summary` key's value will be `failure` if any mandatory components fail
 
+## Build and run locally
+
+The following only needs to be run once:
+
+```bash
+go get -u github.com/constabulary/gb/...
+gb vendor fetch <pkg>
+```
+
+Every time you make a change to your code, run:
+
+```bash
+gb build all && bin/requester ./src/page.yaml
+```
+
+---
+
+> The following details need to be updated
+
 ## Setup example
 
 ### Docker
@@ -138,6 +157,7 @@ I recommend using [Gox](https://github.com/mitchellh/gox).
 
 ## TODO
 
+- Update README
 - Add logic for loading page config remotely
 - Dynamically change port number when run as binary
 - Tests!

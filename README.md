@@ -71,22 +71,40 @@ components:
 
 > Note: the toplevel `summary` key's value will be `failure` if any mandatory components fail
 
-## Setup example
-
-### Docker
+## Run within Docker
 
 - `docker build -t my-golang-app .`
-- `docker run --rm --name go-tester -v "$PWD":/go/src/github.com/integralist/go-requester -w /go/src/github.com/integralist/go-requester -p 8080:8080 my-golang-app`
+- `docker run --rm --name go-tester -v "$PWD":/go/src/app -p 8080:8080 my-golang-app`
 
-### Host machine running Go
+> To test: `docker run -it -v "$PWD":/go/src/app -p 8080:8080 my-golang-app /bin/bash`
 
-- `go run requester.go`
+## Build and run binary on host machine
+
+The following only needs to be run once:
+
+```bash
+go get -u github.com/constabulary/gb/...
+gb vendor fetch gopkg.in/yaml.v2
+```
+
+> Note: to get 'all' dependencies you can also use  
+> gb vendor fetch github.com/<user>/<repo>
+
+Every time you make a change to your code, run:
+
+```bash
+gb build all && bin/requester ./src/page.yaml
+```
+
+### Run application locally on host machine
+
+- `go run src/requester/main.go src/page.yaml`
 - `go run slow-endpoint.go` (see below for an example script)
 - `curl http://localhost:8080/` (better to check via a web browser)
 
-> Note: you can also use `godo run --watch` to track changes and automatically re-run
+> Note: you can also use `godo watch-server --watch` to track changes and automatically re-run
 
-### Slow HTTP Server
+## Slow HTTP Server
 
 ```go
 package main
@@ -118,26 +136,28 @@ func main() {
 
 ## Dependencies
 
-I use [godep](https://github.com/tools/godep) to act like a dependency lockfile (think the Go equivalent to Ruby's `Gemfile.lock`). So you'll find inside this repo a `Godeps` folder containing any packages not part of the standard library.
+I use http://getgb.io/ for handling dependencies. When using `gb vendor fetch <pkg>` it'll place dependencies into a `vendor` directory for you and thus allow `gb build all` to include them within your binary. So you gain a project specific workspace without affecting your global `$GOPATH`.
 
-- `godep save -r`
+> Note: typically you'd execute `go vendor fetch github.com/integralist/go-requester` to pull in all dependencies
+
+We `.gitignore` the `vendor/src` directory but we commit the `vendor/manifest` file (which acts as a dependency lockfile) and then when pulling this repo for the first time you'd need to execute `gb vendor restore`
 
 ## Compilation
 
-I recommend using [Gox](https://github.com/mitchellh/gox).
+Use http://getgb.io/ again, this time `go build all`
+
+An alternative is to use [Gox](https://github.com/mitchellh/gox):
 
 - `go get github.com/mitchellh/gox`
 - `gox`
 
-## Local Testing
-
-> Note: this example is for Mac OS X
-
-- `gox -osarch="darwin/amd64" -output="{{.Dir}}"`
-- `./Go-Requester`
+But I've not yet used it alongside `gb` so I'm not sure if there are any nuances to the setup.
 
 ## TODO
 
+- Check use of `gb` to build different OS and ARCH binaries and include notes in README
+- See if gox works alongside gb
+- Switch from string checking 'timeout' error to using type assertion
 - Add logic for loading page config remotely
 - Dynamically change port number when run as binary
 - Tests!

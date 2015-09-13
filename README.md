@@ -77,7 +77,7 @@ The following only needs to be run once:
 
 ```bash
 go get -u github.com/constabulary/gb/...
-gb vendor fetch <pkg>
+gb vendor fetch gopkg.in/yaml.v2
 ```
 
 Every time you make a change to your code, run:

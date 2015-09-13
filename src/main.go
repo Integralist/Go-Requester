@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/integralist/go-requester/Godeps/_workspace/src/gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 )
 
 type component struct {

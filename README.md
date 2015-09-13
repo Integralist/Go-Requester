@@ -95,15 +95,17 @@ gb build all && bin/requester ./src/page.yaml
 ### Docker
 
 - `docker build -t my-golang-app .`
-- `docker run --rm --name go-tester -v "$PWD":/go/src/github.com/integralist/go-requester -w /go/src/github.com/integralist/go-requester -p 8080:8080 my-golang-app`
+- `docker run --rm --name go-tester -v "$PWD":/go/src/app -p 8080:8080 my-golang-app`
+
+> To test: `docker run -it --name go-tester -v "$PWD":/go/src/app -p 8080:8080 my-golang-app /bin/bash`
 
 ### Host machine running Go
 
-- `go run requester.go`
+- `go run src/requester/main.go src/page.yaml`
 - `go run slow-endpoint.go` (see below for an example script)
 - `curl http://localhost:8080/` (better to check via a web browser)
 
-> Note: you can also use `godo run --watch` to track changes and automatically re-run
+> Note: you can also use `godo watch-server --watch` to track changes and automatically re-run
 
 ### Slow HTTP Server
 
@@ -137,27 +139,23 @@ func main() {
 
 ## Dependencies
 
-I use [godep](https://github.com/tools/godep) to act like a dependency lockfile (think the Go equivalent to Ruby's `Gemfile.lock`). So you'll find inside this repo a `Godeps` folder containing any packages not part of the standard library.
-
-- `godep save -r`
+I use http://getgb.io/ for handling dependencies. When using `gb vendor fetch <pkg>` it'll place dependencies into a `vendor` directory for you and thus allow `gb build all` to include them within your binary. So you gain a project specific workspace without affecting your global `$GOPATH`.
 
 ## Compilation
 
-I recommend using [Gox](https://github.com/mitchellh/gox).
+Use http://getgb.io/ again, this time `go build all`
+
+An alternative is to use [Gox](https://github.com/mitchellh/gox):
 
 - `go get github.com/mitchellh/gox`
 - `gox`
 
-## Local Testing
-
-> Note: this example is for Mac OS X
-
-- `gox -osarch="darwin/amd64" -output="{{.Dir}}"`
-- `./Go-Requester`
+But I've not yet used it alongside `gb` so I'm not sure if there are any nuances to the setup.
 
 ## TODO
 
-- Update README
+- Check use of `gb` to build different OS and ARCH binaries and include notes in README
+- See if gox works alongside gb
 - Add logic for loading page config remotely
 - Dynamically change port number when run as binary
 - Tests!

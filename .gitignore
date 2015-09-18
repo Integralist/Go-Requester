@@ -6,3 +6,4 @@ pkg
 bin
 .Dockerfile.swp
 .Godofile.go.swp
+vendor/src

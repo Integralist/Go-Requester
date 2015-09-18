@@ -71,7 +71,14 @@ components:
 
 > Note: the toplevel `summary` key's value will be `failure` if any mandatory components fail
 
-## Build and run locally
+## Run within Docker
+
+- `docker build -t my-golang-app .`
+- `docker run --rm --name go-tester -v "$PWD":/go/src/app -p 8080:8080 my-golang-app`
+
+> To test: `docker run -it -v "$PWD":/go/src/app -p 8080:8080 my-golang-app /bin/bash`
+
+## Build and run binary on host machine
 
 The following only needs to be run once:
 
@@ -80,26 +87,16 @@ go get -u github.com/constabulary/gb/...
 gb vendor fetch gopkg.in/yaml.v2
 ```
 
+> Note: to get 'all' dependencies you can also use  
+> gb vendor fetch github.com/<user>/<repo>
+
 Every time you make a change to your code, run:
 
 ```bash
 gb build all && bin/requester ./src/page.yaml
 ```
 
----
-
-> The following details need to be updated
-
-## Setup example
-
-### Docker
-
-- `docker build -t my-golang-app .`
-- `docker run --rm --name go-tester -v "$PWD":/go/src/app -p 8080:8080 my-golang-app`
-
-> To test: `docker run -it --name go-tester -v "$PWD":/go/src/app -p 8080:8080 my-golang-app /bin/bash`
-
-### Host machine running Go
+### Run application locally on host machine
 
 - `go run src/requester/main.go src/page.yaml`
 - `go run slow-endpoint.go` (see below for an example script)
@@ -107,7 +104,7 @@ gb build all && bin/requester ./src/page.yaml
 
 > Note: you can also use `godo watch-server --watch` to track changes and automatically re-run
 
-### Slow HTTP Server
+## Slow HTTP Server
 
 ```go
 package main
@@ -141,6 +138,10 @@ func main() {
 
 I use http://getgb.io/ for handling dependencies. When using `gb vendor fetch <pkg>` it'll place dependencies into a `vendor` directory for you and thus allow `gb build all` to include them within your binary. So you gain a project specific workspace without affecting your global `$GOPATH`.
 
+> Note: typically you'd execute `go vendor fetch github.com/integralist/go-requester` to pull in all dependencies
+
+We `.gitignore` the `vendor/src` directory but we commit the `vendor/manifest` file (which acts as a dependency lockfile) and then when pulling this repo for the first time you'd need to execute `gb vendor restore`
+
 ## Compilation
 
 Use http://getgb.io/ again, this time `go build all`
@@ -156,6 +157,7 @@ But I've not yet used it alongside `gb` so I'm not sure if there are any nuances
 
 - Check use of `gb` to build different OS and ARCH binaries and include notes in README
 - See if gox works alongside gb
+- Switch from string checking 'timeout' error to using type assertion
 - Add logic for loading page config remotely
 - Dynamically change port number when run as binary
 - Tests!

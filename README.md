@@ -76,19 +76,31 @@ components:
 - `docker build -t my-golang-app .`
 - `docker run --rm --name go-tester -v "$PWD":/go/src/app -p 8080:8080 my-golang-app`
 
-> To test: `docker run -it -v "$PWD":/go/src/app -p 8080:8080 my-golang-app /bin/bash`
+If you're using Docker-Machine, then executing the following command will return the results of the running application:
+
+```bash
+curl $(docker-machine ip <name_of_vm>):8080
+```
+
+To test what's happening inside the container then execute the following command:
+
+```bash
+docker run -it -v "$PWD":/go/src/app -p 8080:8080 my-golang-app /bin/bash
+```
 
 ## Build and run binary on host machine
 
-The following only needs to be run once:
+The following command only needs to be run once (it downloads the `gb` tool):
 
 ```bash
 go get -u github.com/constabulary/gb/...
-gb vendor fetch gopkg.in/yaml.v2
 ```
 
-> Note: to get 'all' dependencies you can also use  
-> gb vendor fetch github.com/<user>/<repo>
+Once you have `gb`, download the dependencies (specified within the `vendor/manifest` file) using: 
+
+```bash
+gb vendor restore
+```
 
 Every time you make a change to your code, run:
 
@@ -110,19 +122,19 @@ gb build all && bin/requester ./src/page.yaml
 package main
 
 import (
-	"fmt"
-	"net/http"
-	"time"
+  "fmt"
+  "net/http"
+  "time"
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	time.Sleep(5000 * time.Millisecond)
-	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
+  time.Sleep(5000 * time.Millisecond)
+  fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
 }
 
 func main() {
-	http.HandleFunc("/", handler)
-	http.ListenAndServe(":3000", nil)
+  http.HandleFunc("/", handler)
+  http.ListenAndServe(":3000", nil)
 }
 
 // Example -> http://localhost:3000/pugs

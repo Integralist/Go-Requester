@@ -175,21 +175,9 @@ I use http://getgb.io/ for handling dependencies. When using `gb vendor fetch <p
 
 In order to not have a large repo (consisting of many dependency files), we `.gitignore` the `vendor/src` directory but we still commit the `vendor/manifest` file (which acts as a dependency lockfile). This means when pulling the repo for the first time you'd need to execute `gb vendor restore`.
 
-## Compilation
-
-Use http://getgb.io/ again, this time `go build all`
-
-An alternative is to use [Gox](https://github.com/mitchellh/gox):
-
-- `go get github.com/mitchellh/gox`
-- `gox`
-
-But I've not yet used it alongside `gb` so I'm not sure if there are any nuances to the setup.
-
 ## TODO
 
-- Check use of `gb` to build different OS and ARCH binaries and include notes in README
-- See if gox works alongside gb
+- Refactor code so that certain aspects are loaded from other packages
 - Add logic for loading page config remotely
 - Dynamically change port number when run as binary
 - Tests!

@@ -1,0 +1,7 @@
+#!/usr/bin/expect -f
+
+spawn ssh-add /go/src/app/github_rsa
+expect "Enter passphrase for /go/src/app/github_rsa:"
+send "<your_github_ssh_passphrase>\n";
+interact
+

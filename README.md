@@ -88,6 +88,50 @@ To test what's happening inside the container then execute the following command
 docker run -it -v "$PWD":/go/src/app -p 8080:8080 my-golang-app /bin/bash
 ```
 
+### Private Repos
+
+If you need to use a private repo then I've set-up the Docker container to work with them, but it does require you to pick your poison:
+
+- Run the container interactively (`-it`) and manually enter SSH private key passphrase
+
+OR
+
+- Run the container interactively (`-it`) and save your SSH private key passphrase into an `expect` script
+
+The former is safer and so it's is the default option.
+
+The latter requires you to modify the `ssh.exp` file to include your passphrase and also to uncomment `ssh-add /go/src/app/github_rsa` from `bootstrap.sh` and put back in `/ssh.exp`. But it's your responsibility to make sure you don't commit that passphrase.
+
+> Yes the latter takes a few more steps, but there was no way I was going to automate that for you and make it easy for you to shoot yourself in the foot!
+
+Regardless of which option you choose, you'll need to modify the Docker run command slightly (to use interactive mode `-it`). I'm not sure why though, if anyone has any ideas then please let me know. 
+
+So the command you need to execute, if you're pulling private repositories, is:
+
+```
+docker run -it -v "$HOME/.ssh/github_rsa":/go/src/app/github_rsa -v "$PWD":/go/src/app -p 8080:8080 my-golang-app
+```
+
+> Note: I initially added both `github_rsa` and `id_rsa` to the `.gitignore` file and then switched to `*_rsa` to try and prevent as many mistakes as possible (i.e. avoiding committing your private key to a potentially public repo); so please do be careful if your private key uses a different name!
+
+### In Summary...
+
+No, I'm not specifying any private repo dependencies:
+
+```bash
+docker run --rm -v "$PWD":/go/src/app -p 8080:8080 my-golang-app
+```
+
+Yes, I have some dependencies coming from private repositories:
+
+```bash
+docker run -it -v "$HOME/.ssh/github_rsa":/go/src/app/github_rsa -v "$PWD":/go/src/app -p 8080:8080 my-golang-app "ssh_setup"
+```
+
+- run interactively (`-it` mode)
+- mount your ssh private key
+- specify `ssh_setup`
+
 ## Build and run binary on host machine
 
 The following command only needs to be run once (it downloads the `gb` tool):

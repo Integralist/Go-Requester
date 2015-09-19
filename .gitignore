@@ -9,3 +9,4 @@ bin
 vendor/src
 bin
 pkg
+*_rsa

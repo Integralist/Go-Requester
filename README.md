@@ -188,7 +188,6 @@ But I've not yet used it alongside `gb` so I'm not sure if there are any nuances
 
 - Check use of `gb` to build different OS and ARCH binaries and include notes in README
 - See if gox works alongside gb
-- Switch from string checking 'timeout' error to using type assertion
 - Add logic for loading page config remotely
 - Dynamically change port number when run as binary
 - Tests!

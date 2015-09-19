@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"os"
-	"regexp"
 	"sync"
 	"time"
 
@@ -38,10 +38,8 @@ type result struct {
 	Components []componentResponse `json:"components"`
 }
 
-func checkError(msg string) int {
-	timeout, _ := regexp.MatchString("Timeout", msg)
-
-	if timeout {
+func checkError(err error) int {
+	if e, ok := err.(net.Error); ok && e.Timeout() {
 		return 408
 	}
 	return 500
@@ -61,7 +59,7 @@ func getComponent(wg *sync.WaitGroup, client *http.Client, i int, v component, c
 
 	if err != nil {
 		fmt.Printf("Problem getting the response: %s\n\n", err)
-		status := checkError(err.Error())
+		status := checkError(err)
 
 		ch <- componentResponse{
 			v.ID, status, err.Error(), getSummary(status), v.Mandatory,

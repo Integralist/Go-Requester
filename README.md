@@ -111,34 +111,11 @@ gb build all && bin/requester ./src/page.yaml
 ### Run application locally on host machine
 
 - `go run src/requester/main.go src/page.yaml`
-- `go run slow-endpoint.go` (see below for an example script)
 - `curl http://localhost:8080/` (better to check via a web browser)
 
 > Note: you can also use `godo watch-server --watch` to track changes and automatically re-run
 
-## Slow HTTP Server
-
-```go
-package main
-
-import (
-  "fmt"
-  "net/http"
-  "time"
-)
-
-func handler(w http.ResponseWriter, r *http.Request) {
-  time.Sleep(5000 * time.Millisecond)
-  fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
-}
-
-func main() {
-  http.HandleFunc("/", handler)
-  http.ListenAndServe(":3000", nil)
-}
-
-// Example -> http://localhost:3000/pugs
-```
+If you want to see how latency/slow responses effect the application then try also running: https://github.com/Integralist/go-slow-http-server which was specifically designed to be used alongside go-requester for testing
 
 ## Curl Timings
 

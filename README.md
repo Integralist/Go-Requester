@@ -150,9 +150,7 @@ func main() {
 
 I use http://getgb.io/ for handling dependencies. When using `gb vendor fetch <pkg>` it'll place dependencies into a `vendor` directory for you and thus allow `gb build all` to include them within your binary. So you gain a project specific workspace without affecting your global `$GOPATH`.
 
-> Note: typically you'd execute `go vendor fetch github.com/integralist/go-requester` to pull in all dependencies
-
-We `.gitignore` the `vendor/src` directory but we commit the `vendor/manifest` file (which acts as a dependency lockfile) and then when pulling this repo for the first time you'd need to execute `gb vendor restore`
+In order to not have a large repo (consisting of many dependency files), we `.gitignore` the `vendor/src` directory but we still commit the `vendor/manifest` file (which acts as a dependency lockfile). This means when pulling the repo for the first time you'd need to execute `gb vendor restore`.
 
 ## Compilation
 

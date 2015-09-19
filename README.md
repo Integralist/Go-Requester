@@ -152,6 +152,8 @@ Every time you make a change to your code, run:
 gb build all && bin/requester ./src/page.yaml
 ```
 
+> Note: for other OS' and Arch's use something like `GOOS=linux GOARCH=amd64 gb build`
+
 ### Run application locally on host machine
 
 - `go run src/requester/main.go src/page.yaml`

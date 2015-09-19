@@ -98,7 +98,7 @@ OR
 
 - Run the container interactively (`-it`) and save your SSH private key passphrase into an `expect` script
 
-The former is safer and so it's is the default option.
+The former is safer and so it's the default option.
 
 The latter requires you to modify the `ssh.exp` file to include your passphrase and also to uncomment `ssh-add /go/src/app/github_rsa` from `bootstrap.sh` and put back in `/ssh.exp`. But it's your responsibility to make sure you don't commit that passphrase.
 

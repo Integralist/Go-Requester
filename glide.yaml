@@ -1,0 +1,4 @@
+package: github.com/integralist/go-requester
+import:
+- package: gopkg.in/godo.v2
+- package: gopkg.in/yaml.v2

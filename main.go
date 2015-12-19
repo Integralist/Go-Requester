@@ -126,8 +126,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// fmt.Println(string(j))
-
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(j)
 }

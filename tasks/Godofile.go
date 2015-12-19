@@ -1,17 +1,22 @@
 package main
 
-import . "gopkg.in/godo.v1"
+import (
+	"fmt"
+	"os"
 
-func tasks(p *Project) {
-	p.Task("watch-server", func(c *Context) error {
-		// Run("gb build all")
-		// return Run("./bin/requester ./src/page.yaml")
-		// Avoiding because it doesn't trigger rebuild
-		return Start("main.go ../page.yaml", M{"$in": "./src/requester"})
-		// Either way I need to `docker stop <cid>`
-	}).Watch("**/*.go")
+	do "gopkg.in/godo.v2"
+)
+
+func tasks(p *do.Project) {
+	if pwd, err := os.Getwd(); err == nil {
+		do.Env = fmt.Sprintf("GOPATH=%s/vendor::$GOPATH", pwd)
+	}
+
+	p.Task("server", nil, func(c *do.Context) {
+		c.Start("main.go ./config/page.yaml", do.M{"$in": "./"})
+	}).Src("**/*.go")
 }
 
 func main() {
-	Godo(tasks)
+	do.Godo(tasks)
 }

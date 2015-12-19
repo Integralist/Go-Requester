@@ -9,25 +9,17 @@ if [ "$1" = "ssh_setup" ]; then
 
   # run expect to handle entering password for my mounted SSH key
   # /ssh.exp
-  ssh-add /go/src/app/github_rsa
+  ssh-add /.ssh/github_rsa
 
   # automate trusting github as a remote hote
   ssh -o StrictHostKeyChecking=no git@github.com uptime
   ssh -T git@github.com
 fi
 
-if [ ! -d "vendor/src" ]; then
-  echo "Fetching dependencies described within manifest..."
-  gb vendor restore
-fi
-
-if [ ! -d "/go/src/vendor" ]; then
-  echo "Copying vendor packages into \$GOPATH..."
-  cp -r /go/src/app/vendor/src/* /go/src/
-
-  echo "Below is the container's \$GOPATH (with dependencies copied over)..."
-  tree -L 3 /go/src
+if [ ! -d "vendor" ]; then
+  echo "Fetching dependencies described within lock file..."
+  glide install
 fi
 
 echo "Start watching files..."
-godo watch-server --watch
+godo server --watch

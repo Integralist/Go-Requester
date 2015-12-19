@@ -33,7 +33,9 @@ components:
     url: http://httpstat.us/503
 ```
 
-> Note: example config provided as part of this repo
+> Note:  
+> example config provided as part of this repo  
+> `./config/page.yaml`
 
 ## Example JSON Output
 
@@ -71,109 +73,107 @@ components:
 
 > Note: the toplevel `summary` key's value will be `failure` if any mandatory components fail
 
-## Run within Docker
+## Installing Vendored Dependencies
 
-- `docker build -t my-golang-app .`
-- `docker run --rm --name go-tester -v "$PWD":/go/src/app -p 8080:8080 my-golang-app`
-
-If you're using Docker-Machine, then executing the following command will return the results of the running application:
+You'll need [Glide](https://github.com/Masterminds/glide) installed:
 
 ```bash
-curl $(docker-machine ip <name_of_vm>):8080
+go get github.com/Masterminds/glide
 ```
 
-To test what's happening inside the container then execute the following command:
+If using Go `1.6` you're OK, otherwise you'll need to set the vendor experiment:
 
 ```bash
-docker run -it -v "$PWD":/go/src/app -p 8080:8080 my-golang-app /bin/bash
+export GO15VENDOREXPERIMENT=1
 ```
 
-### Private Repos
-
-If you need to use a private repo then I've set-up the Docker container to work with them, but it does require you to pick your poison:
-
-- Run the container interactively (`-it`) and manually enter SSH private key passphrase
-
-OR
-
-- Run the container interactively (`-it`) and save your SSH private key passphrase into an `expect` script
-
-The former is safer and so it's the default option.
-
-The latter requires you to modify the `ssh.exp` file to include your passphrase and also to uncomment `ssh-add /go/src/app/github_rsa` from `bootstrap.sh` and put back in `/ssh.exp`. But it's your responsibility to make sure you don't commit that passphrase.
-
-> Yes the latter takes a few more steps, but there was no way I was going to automate that for you and make it easy for you to shoot yourself in the foot!
-
-Regardless of which option you choose, you'll need to modify the Docker run command slightly (to use interactive mode `-it`). I'm not sure why though, if anyone has any ideas then please let me know. 
-
-So the command you need to execute, if you're pulling private repositories, is:
-
-```
-docker run -it -v "$HOME/.ssh/github_rsa":/go/src/app/github_rsa -v "$PWD":/go/src/app -p 8080:8080 my-golang-app
-```
-
-> Note: I initially added both `github_rsa` and `id_rsa` to the `.gitignore` file and then switched to `*_rsa` to try and prevent as many mistakes as possible (i.e. avoiding committing your private key to a potentially public repo); so please do be careful if your private key uses a different name!
-
-### In Summary...
-
-No, I'm not specifying any private repo dependencies:
+To install the dependencies found in the `Glide.lock` file:
 
 ```bash
-docker run --rm -v "$PWD":/go/src/app -p 8080:8080 my-golang-app
+glide install
 ```
 
-Yes, I have some dependencies coming from private repositories:
+## Build Application
 
 ```bash
-docker run -it -v "$HOME/.ssh/github_rsa":/go/src/app/github_rsa -v "$PWD":/go/src/app -p 8080:8080 my-golang-app "ssh_setup"
+go build
 ```
 
-- run interactively (`-it` mode)
-- mount your ssh private key
-- specify `ssh_setup`
-
-## Build and run binary on host machine
-
-The following command only needs to be run once (it downloads the `gb` tool):
+Once the application is built and installed into your binary path, you can run it:
 
 ```bash
-go get -u github.com/constabulary/gb/...
+go-requester <path/to/your/page/config>
 ```
 
-Once you have `gb`, download the dependencies (specified within the `vendor/manifest` file) using: 
+## Running Locally
+
+There are two ways to run this application locally:
+
+1. Host Machine
+2. Docker
+
+### Host Machine
 
 ```bash
-gb vendor restore
+go run main.go ./config/page.yaml
 ```
 
-Every time you make a change to your code, run:
+> Alternative: `godo server --watch`
+
+Once the application is running, view: `http://localhost:8080/`
+
+If you want to see how latency/slow responses effect the application, then also try running: https://github.com/Integralist/go-slow-http-server which was specifically designed to be used alongside go-requester for testing purposes.
+
+### Docker
 
 ```bash
-gb build all && bin/requester ./src/page.yaml
+docker build -t gorequester .
+docker run --rm --name gr -v "$PWD":/go/src/app -p 5000:8080 gorequester
 ```
 
-> Note: for other OS' and Arch's use something like `GOOS=linux GOARCH=amd64 gb build`
+Once the application is running, view: `http://<docker-machine-ip>:5000/`
 
-### Run application locally on host machine
+To debug the container:
 
-- `go run src/requester/main.go src/page.yaml`
-- `curl http://localhost:8080/` (better to check via a web browser)
+```bash
+docker exec -it <container_id> /bin/bash
+docker run -it --entrypoint /bin/bash -v "$PWD":/go/src/app -p 5000:8080 gorequester
+```
 
-> Note: you can also use `godo watch-server --watch` to track changes and automatically re-run
+If you specify a private repo as a dependency, then you'll need to pass in your SSH credentials:
 
-If you want to see how latency/slow responses effect the application then try also running: https://github.com/Integralist/go-slow-http-server which was specifically designed to be used alongside go-requester for testing
+```bash
+docker run \
+  -it \
+  -v "$PWD":/go/src/app \
+  -v "$HOME/.ssh/github_bbc_rsa":/.ssh/github_rsa \
+  -p 5000:8080 \
+  gorequester ssh_setup
+```
+
+Notice we've passed `ssh_setup`. Our bootstrap script (which runs inside the Docker container) will identify when this argument is provided and subsequently load up the SSH agent within the container. 
+
+Because we've added the `-it` flag we're able to manually type in our SSH private key's passphrase (you *do* use a passphrase don't you?).
+
+#### Expect
+
+Having to type in your SSH passphrase can be annoying an restrict your ability to automate. Although I personally wouldn't advise it, you *can* make a change to the bootstrap script and have it use the `ssh.exp` script included in this repository.
+
+Using this Expect script will mean you don't have to manually enter the passphrase for your SSH private key. The MASSIVE downside to this process is that you'll need to edit the `ssh.exp` script to include your passphrase. This means your secret passphrase has now been codified into the file.
+
+If your laptop is compromised or you commit the change accidentally, then you're in serious trouble. So really... don't use it unless you're really sure you know what you're doing.
+
+You'll also need to comment out the line `ssh-add /.ssh/github_rsa` from the bootstrap script and replace it with `/ssh.exp`.
 
 ## Curl Timings
 
-- `curl -w "@curl-format.txt" -o /dev/null -s http://localhost:8080/`
+We can verify the performance of this application using curl timings, like so:
+
+```bash
+curl -w "@curl-format.txt" -o /dev/null -s http://localhost:8080/
+```
 
 > Note: I've included a `curl-format.txt` file within the repo
-
-## Dependencies
-
-I use http://getgb.io/ for handling dependencies. When using `gb vendor fetch <pkg>` it'll place dependencies into a `vendor` directory for you and thus allow `gb build all` to include them within your binary. So you gain a project specific workspace without affecting your global `$GOPATH`.
-
-In order to not have a large repo (consisting of many dependency files), we `.gitignore` the `vendor/src` directory but we still commit the `vendor/manifest` file (which acts as a dependency lockfile). This means when pulling the repo for the first time you'd need to execute `gb vendor restore`.
 
 ## TODO
 

@@ -93,6 +93,12 @@ To install the dependencies found in the `Glide.lock` file:
 glide install
 ```
 
+## Run Tests
+
+```bash
+go test $(glide novendor)
+```
+
 ## Build Application
 
 ```bash
